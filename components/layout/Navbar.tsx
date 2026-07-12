@@ -5,11 +5,11 @@ import { Menu, X, User } from "lucide-react";
 import { useState } from "react";
 
 const navigation = [
-  { name: "Patients", href: "#" },
-  { name: "Diagnostic Centres", href: "#" },
-  { name: "Corporates", href: "#" },
-  { name: "About", href: "#" },
-  { name: "Contact", href: "#" },
+  { name: "Patients", href: "/patients" },
+  { name: "Diagnostic Centres", href: "/diagnostic-centres" },
+  { name: "Corporates", href: "/corporates" },
+  { name: "About", href: "/about" },
+  { name: "Contact", href: "/contact" },
 ];
 
 export default function Navbar() {
@@ -32,7 +32,7 @@ export default function Navbar() {
               Kretec Health
             </h2>
 
-            <p className="text-xs tracking-wider text-slate-300 uppercase">
+            <p className="text-xs uppercase tracking-wider text-slate-300">
               Diagnostics Platform
             </p>
           </div>
@@ -57,18 +57,24 @@ export default function Navbar() {
 
         <div className="hidden items-center gap-4 lg:flex">
 
-          <button className="flex items-center gap-2 rounded-full border border-white/20 px-5 py-2.5 text-sm font-medium text-white transition hover:border-[#D4AF37] hover:text-[#D4AF37]">
+          <Link
+            href="/login"
+            className="flex items-center gap-2 rounded-full border border-white/20 px-5 py-2.5 text-sm font-medium text-white transition hover:border-[#D4AF37] hover:text-[#D4AF37]"
+          >
             <User size={18} />
             Login
-          </button>
+          </Link>
 
-          <button className="rounded-full bg-[#D4AF37] px-6 py-3 text-sm font-semibold text-[#082B5B] transition duration-300 hover:scale-105 hover:shadow-xl">
+          <Link
+            href="/search"
+            className="rounded-full bg-[#D4AF37] px-6 py-3 text-sm font-semibold text-[#082B5B] transition duration-300 hover:scale-105 hover:shadow-xl"
+          >
             Book a Scan
-          </button>
+          </Link>
 
         </div>
 
-        {/* Mobile Menu */}
+        {/* Mobile Menu Button */}
 
         <button
           onClick={() => setMobileOpen(!mobileOpen)}
@@ -90,20 +96,28 @@ export default function Navbar() {
               <Link
                 key={item.name}
                 href={item.href}
-                className="py-4 text-white"
+                className="py-4 text-white transition hover:text-[#D4AF37]"
                 onClick={() => setMobileOpen(false)}
               >
                 {item.name}
               </Link>
             ))}
 
-            <button className="mt-6 rounded-full border border-white py-3 text-white">
+            <Link
+              href="/login"
+              onClick={() => setMobileOpen(false)}
+              className="mt-6 rounded-full border border-white py-3 text-center text-white transition hover:border-[#D4AF37]"
+            >
               Login
-            </button>
+            </Link>
 
-            <button className="mt-4 rounded-full bg-[#D4AF37] py-3 font-semibold text-[#082B5B]">
+            <Link
+              href="/search"
+              onClick={() => setMobileOpen(false)}
+              className="mt-4 rounded-full bg-[#D4AF37] py-3 text-center font-semibold text-[#082B5B]"
+            >
               Book a Scan
-            </button>
+            </Link>
 
           </div>
 

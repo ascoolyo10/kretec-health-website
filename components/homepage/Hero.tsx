@@ -1,4 +1,4 @@
-import SearchWidget from "@/components/search/SearchWidget";
+import SearchWidget from "../search/SearchWidget";
 import HeroGraphic from "./HeroGraphic";
 
 export default function Hero() {

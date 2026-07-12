@@ -1,162 +1,115 @@
 "use client";
 
-import * as React from "react";
-import { CalendarIcon, MapPin, Search, ScanSearch } from "lucide-react";
-import { format } from "date-fns";
-
-import { Button } from "@/components/ui/button";
+import { ChevronDown } from "lucide-react";
+import { useState } from "react";
 import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-
-import { Calendar } from "@/components/ui/calendar";
-
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "@/components/ui/popover";
-
-import { cn } from "@/lib/utils";
-
-const cities = [
-  "Mumbai",
-  "Delhi",
-  "Bengaluru",
-  "Hyderabad",
-  "Chennai",
-  "Lucknow",
-  "Pune",
-];
-
-const scans = [
-  "CT Scan",
-  "MRI",
-  "PET-CT",
-  "Ultrasound",
-  "X-Ray",
-  "Mammography",
-];
+  MapPin,
+  ScanSearch,
+  Calendar,
+  Search,
+} from "lucide-react";
 
 export default function SearchWidget() {
-  const [date, setDate] = React.useState<Date>();
+  const [city, setCity] = useState("");
+  const [scan, setScan] = useState("");
+  const [date, setDate] = useState("");
 
   return (
-    <div className="rounded-[30px] border border-white/40 bg-white/95 p-2 backdrop-blur-xl shadow-[0_25px_80px_rgba(0,0,0,0.18)]">
+    <div className="mx-auto w-full rounded-[30px] border border-white/30 bg-white/95 p-2 shadow-[0_25px_80px_rgba(0,0,0,0.18)] backdrop-blur-xl">
 
-      <div className="grid lg:grid-cols-[1fr_1fr_1fr_240px] items-center divide-x divide-slate-200">
+      <div className="grid overflow-hidden rounded-[26px] lg:grid-cols-[1fr_1fr_1fr_260px]">
 
         {/* LOCATION */}
 
-        <div className="flex items-center gap-3 px-5">
+        <div className="flex items-center gap-4 border-b border-slate-200 px-6 py-5 lg:border-b-0 lg:border-r">
 
-          <MapPin className="h-5 w-5 text-[#082B5B]" />
+          <MapPin className="h-6 w-6 text-[#082B5B]" />
 
-          <Select>
+          <div className="flex-1">
 
-            <SelectTrigger className="h-20 border-0 rounded-none shadow-none focus:ring-0 text-lg font-medium">
+            <p className="text-xs font-semibold uppercase tracking-wider text-slate-400">
+              Location
+            </p>
 
-              <SelectValue placeholder="Select City" />
+            <select
+              value={city}
+              onChange={(e) => setCity(e.target.value)}
+              className="mt-1 w-full appearance-none bg-transparent text-lg font-semibold text-slate-900 outline-none cursor-pointer"
+            >
+              <option value="">Select City</option>
+              <option>Mumbai</option>
+              <option>Delhi</option>
+              <option>Lucknow</option>
+              <option>Bangalore</option>
+              <option>Hyderabad</option>
+              <option>Chennai</option>
+            </select>
 
-            </SelectTrigger>
-
-            <SelectContent>
-
-              {cities.map((city) => (
-                <SelectItem key={city} value={city}>
-                  {city}
-                </SelectItem>
-              ))}
-
-            </SelectContent>
-
-          </Select>
+          </div>
 
         </div>
 
         {/* SCAN */}
 
-        <div className="flex items-center gap-3 px-5">
+        <div className="flex items-center gap-4 border-b border-slate-200 px-6 py-5 lg:border-b-0 lg:border-r">
 
-         <ScanSearch className="mr-3 h-5 w-5 text-[#082B5B]" />
+          <ScanSearch className="h-6 w-6 text-[#082B5B]" />
 
-          <Select>
+          <div className="flex-1">
 
-            <SelectTrigger className="h-20 border-0 rounded-none shadow-none focus:ring-0 text-lg font-medium">
+            <p className="text-xs font-semibold uppercase tracking-wider text-slate-400">
+              Scan
+            </p>
 
-              <SelectValue placeholder="Select Scan" />
+            <select
+              value={scan}
+              onChange={(e) => setScan(e.target.value)}
+              className="mt-1 w-full bg-transparent text-lg font-semibold text-slate-900 outline-none"
+            >
+              <option value="">Select Scan</option>
+              <option>CT Scan</option>
+              <option>MRI</option>
+              <option>PET-CT</option>
+              <option>Ultrasound</option>
+              <option>X-Ray</option>
+            </select>
 
-            </SelectTrigger>
-
-            <SelectContent>
-
-              {scans.map((scan) => (
-                <SelectItem key={scan} value={scan}>
-                  {scan}
-                </SelectItem>
-              ))}
-
-            </SelectContent>
-
-          </Select>
+          </div>
 
         </div>
 
         {/* DATE */}
 
-        <div className="flex items-center gap-3 px-5">
+        <div className="flex items-center gap-4 border-b border-slate-200 px-6 py-5 lg:border-b-0 lg:border-r">
 
-         <CalendarIcon className="mr-3 h-5 w-5 text-[#082B5B]" />
+          <Calendar className="h-6 w-6 text-[#082B5B]" />
 
-          <Popover>
+          <div className="flex-1">
 
-            <PopoverTrigger>
+            <p className="text-xs font-semibold uppercase tracking-wider text-slate-400">
+              Preferred Date
+            </p>
 
-              <Button
-                variant="outline"
-                className={cn(
-                  "h-20 w-full justify-start rounded-none border-0 shadow-none border-slate-200 text-left font-normal",
-                  !date && "text-slate-400"
-                )}
-              >
-                <CalendarIcon className="mr-2 h-4 w-4" />
+            <input
+              type="date"
+              value={date}
+              onChange={(e) => setDate(e.target.value)}
+              className="mt-1 w-full bg-transparent text-lg font-semibold text-slate-900 outline-none"
+            />
 
-                {date ? format(date, "PPP") : "Choose Date"}
-
-              </Button>
-
-            </PopoverTrigger>
-
-            <PopoverContent className="w-auto p-0">
-
-             <Calendar
-    mode="single"
-    selected={date}
-    onSelect={setDate}
-/>
-
-            </PopoverContent>
-
-          </Popover>
+          </div>
 
         </div>
 
-        {/* BUTTON */}
+        {/* SEARCH */}
 
-        <div className="flex items-end">
+        <button className="flex h-full items-center justify-center gap-3 rounded-[24px] bg-[#D4AF37] px-8 py-6 text-lg font-bold text-[#082B5B] transition duration-300 hover:bg-[#c9a228]">
 
-  <Button
-    className="h-20 w-full rounded-[24px] bg-[#D4AF37] text-[#082B5B] text-lg font-semibold transition-all duration-300 hover:bg-[#caa42f] hover:shadow-xl"
-  >
-    <Search className="mr-2 h-5 w-5" />
-    Search Availability
-  </Button>
+          <Search className="h-5 w-5" />
 
-</div>
+          Search Availability
+
+        </button>
 
       </div>
 
