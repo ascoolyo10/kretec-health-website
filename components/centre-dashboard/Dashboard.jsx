@@ -1,20 +1,20 @@
 
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import {
   BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
-  LineChart, Line, PieChart, Pie, Cell, Legend
+  PieChart, Pie, Cell
 } from "recharts";
 import {
   Activity, AlertTriangle, Banknote, Boxes, Calendar, ClipboardList,
-  FileText, Gauge, LayoutGrid, ShieldCheck, Wrench, Users, ChevronDown,
+  FileText, Gauge, LayoutGrid, ShieldCheck, Wrench, ChevronDown,
   TrendingUp, TrendingDown, Circle, Clock, IndianRupee, MapPin
 } from "lucide-react";
 
 /* ----------------------------- MOCK DATA ----------------------------- */
 
-const LOCATIONS = ["Andheri", "Thane", "Borivali"];
+const DEFAULT_LOCATIONS = ["Andheri", "Thane", "Borivali"];
 
 const EQUIPMENT = [
   { id: "EQ-01", location: "Andheri", modality: "CT", model: "NeuViz ACE", oem: "Neusoft", installDate: "2022-03-14",
@@ -198,7 +198,7 @@ function Td({ children, className = "" }) {
 
 /* ----------------------------- MODULES ----------------------------- */
 
-function Overview({ equipment, locationMode }) {
+function Overview({ equipment, locationMode, locations }) {
   const revenueToday = equipment.reduce((a, e) => a + e.revenueToday, 0);
   const revenueMTD = equipment.reduce((a, e) => a + e.revenueMTD, 0);
   const revenueYTD = equipment.reduce((a, e) => a + e.revenueYTD, 0);
@@ -210,7 +210,7 @@ function Overview({ equipment, locationMode }) {
     COMPLIANCE.filter((c) => c.status === "Expiring Soon").length +
     SPARES.filter((s) => s.stock <= s.reorderLevel).length;
 
-  const byLocation = LOCATIONS.map((loc) => {
+  const byLocation = locations.map((loc) => {
     const eq = EQUIPMENT.filter((e) => e.location === loc);
     return {
       location: loc,
@@ -682,8 +682,31 @@ const TABS = [
 export default function Dashboard() {
   const [activeTab, setActiveTab] = useState("overview");
   const [locationMode, setLocationMode] = useState("single");
-  const [selectedLocation, setSelectedLocation] = useState(LOCATIONS[0]);
+  const [centres, setCentres] = useState([]);
+  const [selectedLocation, setSelectedLocation] = useState(DEFAULT_LOCATIONS[0]);
   const [locPickerOpen, setLocPickerOpen] = useState(false);
+
+  const locations = centres.length ? centres.map((centre) => centre.name) : DEFAULT_LOCATIONS;
+
+  useEffect(() => {
+    async function loadCentres() {
+      const response = await fetch("/api/centres");
+      if (!response.ok) return;
+
+      const { centres: databaseCentres } = await response.json();
+      setCentres(databaseCentres);
+    }
+
+    loadCentres().catch(() => {
+      // Retain the existing location list while the database is unavailable.
+    });
+  }, []);
+
+  useEffect(() => {
+    if (!locations.includes(selectedLocation)) {
+      setSelectedLocation(locations[0]);
+    }
+  }, [locations, selectedLocation]);
 
   const equipment = useMemo(
     () => (locationMode === "all" ? EQUIPMENT : EQUIPMENT.filter((e) => e.location === selectedLocation)),
@@ -768,7 +791,7 @@ export default function Dashboard() {
                 </button>
                 {locPickerOpen && (
                   <div className="absolute right-0 mt-1 bg-slate-900 border border-slate-800 rounded shadow-lg z-20 min-w-[140px]">
-                    {LOCATIONS.map((loc) => (
+                    {locations.map((loc) => (
                       <button
                         key={loc}
                         onClick={() => { setSelectedLocation(loc); setLocPickerOpen(false); }}
@@ -786,7 +809,7 @@ export default function Dashboard() {
 
         {/* Content */}
         <div className="p-6 overflow-y-auto">
-          {activeTab === "overview" && <Overview equipment={equipment} locationMode={locationMode} />}
+          {activeTab === "overview" && <Overview equipment={equipment} locationMode={locationMode} locations={locations} />}
           {activeTab === "equipment" && <EquipmentModule equipment={equipment} />}
           {activeTab === "utilization" && <UtilizationModule equipment={equipment} />}
           {activeTab === "revenue" && <RevenueModule equipment={equipment} />}
@@ -802,3 +825,4 @@ export default function Dashboard() {
     </div>
   );
 }
+

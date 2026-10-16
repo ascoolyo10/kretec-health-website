@@ -1,0 +1,127 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model Centre {
+  id        String   @id @default(cuid())
+  name      String   @unique
+  slug      String   @unique
+  city      String
+  state     String
+  address   String
+  phone     String
+  email     String
+  modalities String
+  accreditation String
+  licenseNumber String
+  operatingHours String
+  reportingTatHours Int
+  dailyScanCapacity Int
+  isActive  Boolean  @default(true)
+  services  Service[]
+  slots     Slot[]
+  bookings  Booking[]
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Service {
+  id                   String   @id @default(cuid())
+  centreId             String
+  centre               Centre   @relation(fields: [centreId], references: [id], onDelete: Cascade)
+  modality             String
+  name                 String
+  bodyPart             String?
+  description          String?
+  preparation          String?
+  cashPrice            Int
+  platformPrice        Int
+  currency             String   @default("INR")
+  durationMinutes      Int
+  reportTurnaroundHours Int
+  isActive             Boolean  @default(true)
+  slots                Slot[]
+  bookings             Booking[]
+  createdAt            DateTime @default(now())
+  updatedAt            DateTime @updatedAt
+
+  @@unique([centreId, name])
+  @@index([centreId, modality])
+}
+
+model Slot {
+  id          String   @id @default(cuid())
+  centreId    String
+  serviceId   String
+  centre      Centre   @relation(fields: [centreId], references: [id], onDelete: Cascade)
+  service     Service  @relation(fields: [serviceId], references: [id], onDelete: Cascade)
+  startsAt    DateTime
+  endsAt      DateTime
+  status      String   @default("OPEN")
+  holdExpiresAt DateTime?
+  booking     Booking?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([centreId, startsAt, status])
+  @@index([serviceId, startsAt])
+}
+
+model Patient {
+  id          String   @id @default(cuid())
+  phone       String   @unique
+  email       String?  @unique
+  fullName    String
+  dateOfBirth DateTime?
+  gender      String?
+  consentToStoreData Boolean @default(false)
+  consentToMarketing Boolean @default(false)
+  bookings    Booking[]
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model Booking {
+  id             String   @id @default(cuid())
+  bookingNumber  String   @unique
+  patientId      String
+  centreId       String
+  serviceId      String
+  slotId         String   @unique
+  patient        Patient  @relation(fields: [patientId], references: [id], onDelete: Restrict)
+  centre         Centre   @relation(fields: [centreId], references: [id], onDelete: Restrict)
+  service        Service  @relation(fields: [serviceId], references: [id], onDelete: Restrict)
+  slot           Slot     @relation(fields: [slotId], references: [id], onDelete: Restrict)
+  status         String   @default("PENDING")
+  amountCharged  Int
+  commissionAmount Int @default(0)
+  payoutAmount   Int    @default(0)
+  paymentStatus  String @default("PENDING")
+  checkInAt      DateTime?
+  completedAt    DateTime?
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  @@index([centreId, status])
+  @@index([patientId, createdAt])
+}
+
+model Notification {
+  id          String   @id @default(cuid())
+  bookingId   String?
+  channel     String
+  recipient   String
+  template    String
+  status      String   @default("QUEUED")
+  providerRef String?
+  sentAt      DateTime?
+  createdAt   DateTime @default(now())
+
+  @@index([bookingId, status])
+}
+
